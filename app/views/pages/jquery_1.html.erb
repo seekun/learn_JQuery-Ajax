@@ -1,0 +1,13 @@
+<p>
+  <a id="my-click">Click me</a>
+</p>
+
+<div id="foo" style="border: 1px solid red;">
+  <p>bar</p>
+</div>
+
+<script type="text/javascript" charset="utf-8">
+  $("#my-click").click(function () {
+      $("#foo").html("<h1>test</h1>");
+  })
+</script>
