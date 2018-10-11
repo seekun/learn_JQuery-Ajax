@@ -7,5 +7,6 @@ class Post < ApplicationRecord
   def find_like(user)
     self.likes.where(:user_id => user.id).first
   end
+  belongs_to :category, :optional => true
 
 end

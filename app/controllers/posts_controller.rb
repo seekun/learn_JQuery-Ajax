@@ -2,7 +2,15 @@ class PostsController < ApplicationController
   before_action :authenticate_user!, :only => [:create, :destroy]
 
   def index
-    @posts = Post.order("id DESC").all # 新贴文放前面
+    @posts = Post.order("id DESC").limit(20) # 新贴文放前面
+    if params[:max_id]
+      @posts = @posts.where( "id < ?", params[:max_id])
+    end
+    respond_to do |format|
+      format.html
+      format.js
+    end
+
   end
 
   def new
@@ -21,7 +29,8 @@ class PostsController < ApplicationController
   def destroy
     @post = current_user.posts.find(params[:id]) # 只能删除自己的贴文
     @post.destroy
-
+    # render :json => { :id => @post.id}
+    render :json => {:id => @post.id}
     # redirect_to posts_path
     # render :js => "alert('ok');"
   end
@@ -44,11 +53,35 @@ class PostsController < ApplicationController
     # redirect_to posts_path
   end
 
+  def toggle_flag
+    @post = Post.find(params[:id])
+
+    if @post.flag_at
+      @post.flag_at = nil
+    else
+      @post.flag_at = Time.now
+    end
+
+    @post.save!
+
+    render :json => {:message => "ok", :flag_at => @post.flag_at, :id => @post.id}
+  end
+
+  def update
+    @post = Post.find(params[:id])
+    @post.update!(post_params)
+    sleep(3)
+
+    # render :json => ( :id => @post.id, :message => "ok")
+    render :json => { :id => @post.id, :message => "ok"}
+
+  end
+
   protected
 
 
 
   def post_params
-    params.require(:post).permit(:content)
+    params.require(:post).permit(:content, :category_id)
   end
 end
